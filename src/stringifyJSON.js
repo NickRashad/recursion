@@ -19,8 +19,8 @@ var stringifyJSON = function(obj) {
       return '[' + newArray + ']';
   } else if (typeof obj === "object") {
     var result = Object.keys(obj).map(o => {
-      if(stringifyJSON(obj[o]) !== null){
-        return '"' + o + '":' + stringifyJSON(obj[o])
+      if (stringifyJSON(obj[o]) !== null){
+        return '"' + o + '":' + stringifyJSON(obj[o]);
       } 
     }).filter(o => o !== undefined);
     return "{" + result.join(",") + "}";
