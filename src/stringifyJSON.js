@@ -2,52 +2,32 @@
 // var stringifyJSON = JSON.stringify;
 
 // but you don't so you're going to write it from scratch:
-
+function type(obj) {
+  return Object.prototype.toString.call(obj).match(/.* (.*)\]/)[  1]
+}
 var stringifyJSON = function(obj) {
-  if (obj[0] === undefined){
-    return [];
-  } else if(typeof obj[0] === "number" || typeof obj[0] === "boolean"){
-    return [obj[0]].concat( stringifyJSON(obj.slice(1)) );
-  } else if(obj[0] === null){
-    return [null].concat( stringifyJSON(obj.slice(1)) );
-  } else if(typeof obj[0] === "string"){
-    return [ obj[0] ].concat( stringifyJSON(obj.slice(1)) );
-  } else if(Array.isArray(obj[0])) {
-    return [stringifyJSON(obj[0])].concat( stringifyJSON(obj.slice(1)) );
-  } else if(typeof obj[0] === "object"){
-    var newObj = {};
-    for(var key in obj[0]){
-      newObj['"' + key + '"'] = obj[0][key];
-    }
-    return [newObj].concat( stringifyJSON(obj.slice(1)) );
+  if (typeof obj === "function" || typeof obj === "undefined") {
+    return null;
+  } else if (obj === null) {
+    return "null";
+  } else if (typeof obj === "number" || typeof obj === "boolean") {
+    return "" + obj;
+  } else if (typeof obj === "string") {
+    return '"' + obj + '"';
+  } else if (Array.isArray(obj)) {
+      var newArray = obj.map(o => stringifyJSON(o)).join(",");
+      return '[' + newArray + ']';
+  } else if (typeof obj === "object") {
+    var result = Object.keys(obj).map(o => {
+      if(stringifyJSON(obj[o]) !== null){
+        return '"' + o + '":' + stringifyJSON(obj[o])
+      } 
+    }).filter(o => o !== undefined);
+    return "{" + result.join(",") + "}";
   }
 };
-
 /*
-var letSee = stringifyJSON([
-  9,
-  null,
-  true,
-  false,
-  'Hello world',
-  8,
-  [],
-  [8],
-  ['hi'],
-  [8, 'hi'],
-  [1, 0, -1, -0.3, 0.3, 1343.32, 3345, 0.00011999999999999999],
-  [8, [[], 3, 4]],
-  [[[['foo']]]],
-  {},
-  {'a': 'apple'},
-  {'foo': true, 'bar': false, 'baz': null},
-  {'boolean, true': true, 'boolean, false': false, 'null': null },
-  // basic nesting
-  {'a': {'b': 'c'}},
-  {'a': ['b', 'c']},
-  [{'a': 'b'}, {'c': 'd'}],
-  {'a': [], 'c': {}, 'b': true}
-  ]);
-
-  console.log(letSee);  
+https://github.com/douglascrockford/JSON-js/blob/master/json2.js
+https://stackoverflow.com/questions/22333101/recursive-json-stringify-implementation
+https://medium.com/functional-javascript/recursion-282a6abbf3c5
 */
